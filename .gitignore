@@ -1,0 +1,16 @@
+# Java
+*.class
+*.jar
+hs_err_pid*.log
+
+# Maven
+/target/
+pom.xml.*
+dependency-reduced-pom.xml
+release.properties
+.mvn
+
+# IntelliJ
+/.idea/
+*.iml
+*.ipr

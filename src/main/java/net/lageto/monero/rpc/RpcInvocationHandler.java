@@ -18,6 +18,7 @@ package net.lageto.monero.rpc;
 
 import com.jayway.jsonpath.DocumentContext;
 import net.lageto.monero.rpc.annotation.RpcMethod;
+import net.lageto.monero.rpc.annotation.RpcParam;
 import net.lageto.monero.rpc.http.JsonBodyHandler;
 import net.lageto.monero.rpc.http.JsonBodyPublisher;
 
@@ -27,6 +28,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Arrays;
+import java.util.HashMap;
 
 class RpcInvocationHandler implements InvocationHandler {
     private final URI uri;
@@ -61,6 +64,17 @@ class RpcInvocationHandler implements InvocationHandler {
             return new RpcRequest<>(rpcMethod.value(), null);
         }
 
-        throw new UnsupportedOperationException();
+        var params = new HashMap<String, Object>();
+        for (int i = 0; i < args.length; i++) {
+            String paramName = Arrays.stream(method.getParameterAnnotations()[i])
+                    .filter(a -> a.annotationType().equals(RpcParam.class))
+                    .findFirst()
+                    .map(a -> ((RpcParam) a).value())
+                    .orElseThrow(RuntimeException::new);
+
+            params.put(paramName, args[i]);
+        }
+
+        return new RpcRequest<>(rpcMethod.value(), params);
     }
 }

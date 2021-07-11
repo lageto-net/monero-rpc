@@ -17,6 +17,8 @@
 package net.lageto.monero.rpc;
 
 import net.lageto.monero.rpc.annotation.RpcMethod;
+import net.lageto.monero.rpc.annotation.RpcParam;
+import net.lageto.monero.rpc.model.BlockHeader;
 
 import java.lang.reflect.Proxy;
 import java.net.URI;
@@ -43,4 +45,24 @@ public interface DaemonRpcClient {
      */
     @RpcMethod(value = "get_block_count", body = "$.result.count")
     long getBlockCount();
+
+    /**
+     * Fetch a block's header by its hash.
+     *
+     * @param hash hash of the block to lookup, as a hex string
+     * @return block header
+     * @see #getBlockHeader(long)
+     */
+    @RpcMethod(value = "get_block_header_by_hash", body = "$.result.block_header")
+    BlockHeader getBlockHeader(@RpcParam("hash") String hash);
+
+    /**
+     * Fetch a block's header by its height.
+     *
+     * @param height height of the block to lookup
+     * @return block header
+     * @see #getBlockHeader(String)
+     */
+    @RpcMethod(value = "get_block_header_by_height", body = "$.result.block_header")
+    BlockHeader getBlockHeader(@RpcParam("height") long height);
 }

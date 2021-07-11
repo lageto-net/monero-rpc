@@ -21,11 +21,16 @@
  * <p>
  * The {@link net.lageto.monero.rpc} package contains the clients themselves.
  * </p>
+ * <p>
+ * The {@link net.lageto.monero.rpc.model} package contains objects that RPC methods may return or use as parameters.
+ * </p>
  */
 module lageto.monero.rpc {
     exports net.lageto.monero.rpc;
+    exports net.lageto.monero.rpc.model;
 
     opens net.lageto.monero.rpc to com.fasterxml.jackson.databind;
+    opens net.lageto.monero.rpc.model to com.fasterxml.jackson.databind;
 
     requires java.net.http;
 

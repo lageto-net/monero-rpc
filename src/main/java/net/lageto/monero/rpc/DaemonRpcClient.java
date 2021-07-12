@@ -22,6 +22,7 @@ import net.lageto.monero.rpc.model.BlockHeader;
 
 import java.lang.reflect.Proxy;
 import java.net.URI;
+import java.util.concurrent.CompletableFuture;
 
 public interface DaemonRpcClient {
     /**
@@ -42,9 +43,19 @@ public interface DaemonRpcClient {
      * Look up how many blocks are in the longest chain known to the daemon.
      *
      * @return number of blocks in longest chain seen by the node
+     * @see #getBlockCountAsync()
      */
     @RpcMethod(value = "get_block_count", body = "$.result.count")
     long getBlockCount();
+
+    /**
+     * Asynchronously look up how many blocks are in the longest chain known to the daemon.
+     *
+     * @return a future that completes to the number of blocks in the longest chain seen by the node
+     * @see #getBlockCount()
+     */
+    @RpcMethod(value = "get_block_count", body = "$.result.count")
+    CompletableFuture<Long> getBlockCountAsync();
 
     /**
      * Fetch a block's header by its hash.
@@ -52,9 +63,20 @@ public interface DaemonRpcClient {
      * @param hash hash of the block to lookup, as a hex string
      * @return block header
      * @see #getBlockHeader(long)
+     * @see #getBlockHeaderAsync(String)
      */
     @RpcMethod(value = "get_block_header_by_hash", body = "$.result.block_header")
     BlockHeader getBlockHeader(@RpcParam("hash") String hash);
+
+    /**
+     * Asynchronously fetch a block's header by its hash.
+     *
+     * @param hash hash of the block to lookup, as a hex string
+     * @return a future that completes to the requested block header
+     * @see #getBlockHeader(String)
+     */
+    @RpcMethod(value = "get_block_header_by_hash", body = "$.result.block_header")
+    CompletableFuture<BlockHeader> getBlockHeaderAsync(@RpcParam("hash") String hash);
 
     /**
      * Fetch a block's header by its height.
@@ -62,7 +84,18 @@ public interface DaemonRpcClient {
      * @param height height of the block to lookup
      * @return block header
      * @see #getBlockHeader(String)
+     * @see #getBlockHeaderAsync(long)
      */
     @RpcMethod(value = "get_block_header_by_height", body = "$.result.block_header")
     BlockHeader getBlockHeader(@RpcParam("height") long height);
+
+    /**
+     * Asynchronously fetch a block's header by its height.
+     *
+     * @param height height of the block to lookup
+     * @return a future that completes to the requested block header
+     * @see #getBlockHeader(long)
+     */
+    @RpcMethod(value = "get_block_header_by_height", body = "$.result.block_header")
+    CompletableFuture<BlockHeader> getBlockHeaderAsync(@RpcParam("height") long height);
 }

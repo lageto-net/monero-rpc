@@ -24,12 +24,14 @@ import net.lageto.monero.rpc.http.JsonBodyPublisher;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
 
 class RpcInvocationHandler implements InvocationHandler {
     private final URI uri;
@@ -54,9 +56,16 @@ class RpcInvocationHandler implements InvocationHandler {
                         .uri(uri)
                         .POST(JsonBodyPublisher.ofObject(body(rpcMethod, method, args)))
                         .build();
-        final HttpResponse<DocumentContext> response = httpClient.send(request, new JsonBodyHandler());
 
-        return response.body().read(rpcMethod.body(), method.getReturnType());
+        if (method.getReturnType().equals(CompletableFuture.class)) {
+            var returnType = (Class<?>) ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments()[0];
+            return httpClient.sendAsync(request, new JsonBodyHandler())
+                    .thenApply(HttpResponse::body)
+                    .thenApply(body -> body.read(rpcMethod.body(), returnType));
+        } else {
+            final HttpResponse<DocumentContext> response = httpClient.send(request, new JsonBodyHandler());
+            return response.body().read(rpcMethod.body(), method.getReturnType());
+        }
     }
 
     private RpcRequest<?> body(RpcMethod rpcMethod, Method method, Object[] args) {

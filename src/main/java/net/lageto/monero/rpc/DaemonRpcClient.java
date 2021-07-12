@@ -24,6 +24,12 @@ import java.lang.reflect.Proxy;
 import java.net.URI;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Represents a connection to a Monero P2P daemon.
+ * <p>
+ * See {@link #newInstance(URI)} to create a new instance.
+ * </p>
+ */
 public interface DaemonRpcClient {
     /**
      * Create a new instance of a {@code DaemonRpcClient}

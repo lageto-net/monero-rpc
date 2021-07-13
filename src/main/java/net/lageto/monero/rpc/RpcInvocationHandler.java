@@ -16,13 +16,17 @@
 
 package net.lageto.monero.rpc;
 
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPathException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.TreeNode;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import net.lageto.monero.rpc.annotation.RpcMethod;
 import net.lageto.monero.rpc.annotation.RpcParam;
 import net.lageto.monero.rpc.http.JsonBodyHandler;
 import net.lageto.monero.rpc.http.JsonBodyPublisher;
 
+import java.io.UncheckedIOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -37,10 +41,13 @@ import java.util.concurrent.CompletableFuture;
 class RpcInvocationHandler implements InvocationHandler {
     private final URI uri;
     private final HttpClient httpClient;
+    private final ObjectMapper objectMapper;
 
     RpcInvocationHandler(URI uri) {
         this.uri = uri;
         httpClient = HttpClient.newHttpClient();
+        objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     @Override
@@ -60,28 +67,38 @@ class RpcInvocationHandler implements InvocationHandler {
 
         if (method.getReturnType().equals(CompletableFuture.class)) {
             var returnType = (Class<?>) ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments()[0];
-            return httpClient.sendAsync(request, new JsonBodyHandler())
+            return httpClient.sendAsync(request, new JsonBodyHandler(objectMapper))
                     .thenApply(HttpResponse::body)
                     .thenApply(this::checkResponseBody)
-                    .thenApply(body -> body.read(rpcMethod.body(), returnType));
+                    .thenApply(body -> body.get("result"))
+                    .thenApply(result -> rpcMethod.body().equals("$") ? result : result.get(rpcMethod.body()))
+                    .thenApply(result -> {
+                        try {
+                            return objectMapper.treeToValue(result, returnType);
+                        } catch (JsonProcessingException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
         } else {
-            final HttpResponse<DocumentContext> response = httpClient.send(request, new JsonBodyHandler());
-            return checkResponseBody(response.body()).read(rpcMethod.body(), method.getReturnType());
+            final HttpResponse<ObjectNode> response = httpClient.send(request, new JsonBodyHandler(objectMapper));
+            ObjectNode body = checkResponseBody(response.body());
+            TreeNode result = body.get("result");
+            if (!rpcMethod.body().equals("$")) {
+                result = result.get(rpcMethod.body());
+            }
+            return objectMapper.treeToValue(result, method.getReturnType());
         }
     }
 
-    private DocumentContext checkResponseBody(DocumentContext body) {
-        // JsonPath does not allow you to check if a key exists, so just try to read the error - if it throws an
-        // exception, the error is not present.
-        try {
-            body.read("$.error");
+    private ObjectNode checkResponseBody(ObjectNode body) {
+        if (body.findValue("error") instanceof ObjectNode error) {
             throw new RpcException(
-                    body.read("$.error.code"),
-                    body.read("$.error.message")
+                    error.get("code").asInt(-1),
+                    error.get("message").asText("Unknown error")
             );
-        } catch (JsonPathException e) {
-            return body;
         }
+
+        return body;
     }
 
     private RpcRequest<?> createBody(RpcMethod rpcMethod, Method method, Object[] args) {

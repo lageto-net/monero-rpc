@@ -51,7 +51,7 @@ public interface DaemonRpcClient {
      * @return number of blocks in longest chain seen by the node
      * @see #getBlockCountAsync()
      */
-    @RpcMethod(value = "get_block_count", body = "$.result.count")
+    @RpcMethod(value = "get_block_count", body = "count")
     long getBlockCount();
 
     /**
@@ -60,7 +60,7 @@ public interface DaemonRpcClient {
      * @return a future that completes to the number of blocks in the longest chain seen by the node
      * @see #getBlockCount()
      */
-    @RpcMethod(value = "get_block_count", body = "$.result.count")
+    @RpcMethod(value = "get_block_count", body = "count")
     CompletableFuture<Long> getBlockCountAsync();
 
     /**
@@ -72,7 +72,7 @@ public interface DaemonRpcClient {
      * @see #getBlockHeader(long)
      * @see #getBlockHeaderAsync(String)
      */
-    @RpcMethod(value = "get_block_header_by_hash", body = "$.result.block_header")
+    @RpcMethod(value = "get_block_header_by_hash", body = "block_header")
     BlockHeader getBlockHeader(@RpcParam("hash") String hash);
 
     /**
@@ -82,7 +82,7 @@ public interface DaemonRpcClient {
      * @return a future that completes to the requested block header
      * @see #getBlockHeader(String)
      */
-    @RpcMethod(value = "get_block_header_by_hash", body = "$.result.block_header")
+    @RpcMethod(value = "get_block_header_by_hash", body = "block_header")
     CompletableFuture<BlockHeader> getBlockHeaderAsync(@RpcParam("hash") String hash);
 
     /**
@@ -94,7 +94,7 @@ public interface DaemonRpcClient {
      * @see #getBlockHeader(String)
      * @see #getBlockHeaderAsync(long)
      */
-    @RpcMethod(value = "get_block_header_by_height", body = "$.result.block_header")
+    @RpcMethod(value = "get_block_header_by_height", body = "block_header")
     BlockHeader getBlockHeader(@RpcParam("height") long height);
 
     /**
@@ -104,6 +104,6 @@ public interface DaemonRpcClient {
      * @return a future that completes to the requested block header
      * @see #getBlockHeader(long)
      */
-    @RpcMethod(value = "get_block_header_by_height", body = "$.result.block_header")
+    @RpcMethod(value = "get_block_header_by_height", body = "block_header")
     CompletableFuture<BlockHeader> getBlockHeaderAsync(@RpcParam("height") long height);
 }

@@ -16,34 +16,31 @@
 
 package net.lageto.monero.rpc.http;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
-import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.net.http.HttpResponse;
 
-public class JsonBodyHandler implements HttpResponse.BodyHandler<DocumentContext> {
-    private static final Configuration configuration;
+public class JsonBodyHandler implements HttpResponse.BodyHandler<ObjectNode> {
+    private final ObjectMapper objectMapper;
 
-    static {
-        var objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-        configuration = Configuration.builder()
-                .jsonProvider(new JacksonJsonProvider(objectMapper))
-                .mappingProvider(new JacksonMappingProvider(objectMapper))
-                .build();
+    public JsonBodyHandler(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
     }
 
     @Override
-    public HttpResponse.BodySubscriber<DocumentContext> apply(HttpResponse.ResponseInfo responseInfo) {
+    public HttpResponse.BodySubscriber<ObjectNode> apply(HttpResponse.ResponseInfo responseInfo) {
         final HttpResponse.BodySubscriber<InputStream> upstream = HttpResponse.BodySubscribers.ofInputStream();
 
-        return HttpResponse.BodySubscribers.mapping(upstream, is -> JsonPath.parse(is, configuration));
+        return HttpResponse.BodySubscribers.mapping(upstream, is -> {
+            try {
+                return objectMapper.readValue(is, ObjectNode.class);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        });
     }
 }

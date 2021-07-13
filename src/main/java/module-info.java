@@ -35,5 +35,4 @@ module lageto.monero.rpc {
     requires java.net.http;
 
     requires com.fasterxml.jackson.databind;
-    requires json.path;
 }

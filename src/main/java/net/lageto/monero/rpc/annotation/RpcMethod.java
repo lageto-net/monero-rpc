@@ -27,5 +27,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface RpcMethod {
     String value();
 
-    String body() default "$.result";
+    String body() default "$";
 }

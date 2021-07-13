@@ -4,27 +4,24 @@ A library for Java developers to interface with the Monero P2P daemon and wallet
 
 ## Getting monero-rpc
 
-No releases have been tagged yet, but snapshots are frequently published to the Maven Central snapshots repository.
-See below for an excerpt from a `pom.xml` file that adds monero-rpc as a dependency.
+monero-rpc is distributed via Maven Central.  Regular snapshot releases are also frequently published to the Maven Central snapshots repository.
+
+See below for various build tool snippets.
+
+##### Maven
 
 ```xml
-<repositories>
-    <repository>
-        <id>ossrh-snapshots</id>
-        <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-        <snapshots>
-            <enabled>true</enabled>
-        </snapshots>
-    </repository>
-</repositories>
+<dependency>
+    <groupId>net.lageto.monero</groupId>
+    <artifactId>rpc</artifactId>
+    <version>0.1.0</version>
+</dependency>
+```
 
-<dependencies>
-    <dependency>
-        <groupId>net.lageto.monero</groupId>
-        <artifactId>rpc</artifactId>
-        <version>0.1.0-SNAPSHOT</version>
-    </dependency>
-</dependencies>
+##### Gradle
+
+```groovy
+implementation 'net.lageto.monero:rpc:0.1.0'
 ```
 
 ## Example Usage
@@ -33,11 +30,15 @@ See below for an excerpt from a `pom.xml` file that adds monero-rpc as a depende
 // Create an instance.
 var daemon = DaemonRpcClient.newInstance(URI.create("http://localhost:18081/json_rpc"));
 
-// Perform a blocking call.
-System.out.println(daemon.getBlockCount());
+// Perform blocking calls.
+long height = daemon.getBlockCount() - 1;
+System.out.println(daemon.getBlockHeaderAsync(height));
 
-// Perform an async call.
-daemon.getBlockCountAsync().thenAccept(System.out::println);
+// Perform async calls.
+daemon.getBlockCountAsync()
+    .thenApply(count -> count - 1)
+    .thenCompose(daemon::getBlockHeaderAsync)
+    .thenAccept(System.out::println);
 ```
 
 ## License

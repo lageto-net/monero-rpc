@@ -68,6 +68,7 @@ public interface DaemonRpcClient {
      *
      * @param hash hash of the block to lookup, as a hex string
      * @return block header
+     * @throws RpcException for malformed or non-existent block hash
      * @see #getBlockHeader(long)
      * @see #getBlockHeaderAsync(String)
      */
@@ -89,6 +90,7 @@ public interface DaemonRpcClient {
      *
      * @param height height of the block to lookup
      * @return block header
+     * @throws RpcException for non-existent block height
      * @see #getBlockHeader(String)
      * @see #getBlockHeaderAsync(long)
      */

@@ -17,6 +17,7 @@
 package net.lageto.monero.rpc;
 
 import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPathException;
 import net.lageto.monero.rpc.annotation.RpcMethod;
 import net.lageto.monero.rpc.annotation.RpcParam;
 import net.lageto.monero.rpc.http.JsonBodyHandler;
@@ -54,21 +55,36 @@ class RpcInvocationHandler implements InvocationHandler {
         final HttpRequest request =
                 HttpRequest.newBuilder()
                         .uri(uri)
-                        .POST(JsonBodyPublisher.ofObject(body(rpcMethod, method, args)))
+                        .POST(JsonBodyPublisher.ofObject(createBody(rpcMethod, method, args)))
                         .build();
 
         if (method.getReturnType().equals(CompletableFuture.class)) {
             var returnType = (Class<?>) ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments()[0];
             return httpClient.sendAsync(request, new JsonBodyHandler())
                     .thenApply(HttpResponse::body)
+                    .thenApply(this::checkResponseBody)
                     .thenApply(body -> body.read(rpcMethod.body(), returnType));
         } else {
             final HttpResponse<DocumentContext> response = httpClient.send(request, new JsonBodyHandler());
-            return response.body().read(rpcMethod.body(), method.getReturnType());
+            return checkResponseBody(response.body()).read(rpcMethod.body(), method.getReturnType());
         }
     }
 
-    private RpcRequest<?> body(RpcMethod rpcMethod, Method method, Object[] args) {
+    private DocumentContext checkResponseBody(DocumentContext body) {
+        // JsonPath does not allow you to check if a key exists, so just try to read the error - if it throws an
+        // exception, the error is not present.
+        try {
+            body.read("$.error");
+            throw new RpcException(
+                    body.read("$.error.code"),
+                    body.read("$.error.message")
+            );
+        } catch (JsonPathException e) {
+            return body;
+        }
+    }
+
+    private RpcRequest<?> createBody(RpcMethod rpcMethod, Method method, Object[] args) {
         if (method.getParameterCount() == 0) {
             return new RpcRequest<>(rpcMethod.value(), null);
         }

@@ -1,0 +1,19 @@
+---
+on: [ push, pull_request ]
+jobs:
+  javadoc:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
+        with:
+          java-version: 16
+          distribution: adopt
+      - uses: actions/cache@v2
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+      - run: mvn --batch-mode --file pom.xml test
+      - uses: scacap/action-surefire-report@931cea1ce1cb7199a2fc6fe128bd1c392e92c92d
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}

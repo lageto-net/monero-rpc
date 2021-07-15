@@ -10,7 +10,8 @@ public class TestDataParameterResolver implements ParameterResolver {
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
             throws ParameterResolutionException {
-        return parameterContext.getParameter().getType().equals(BlockHeader.class);
+        return parameterContext.getParameter().getType().equals(BlockHeader.class)
+                || parameterContext.getParameter().isAnnotationPresent(WalletAddress.class);
     }
 
     @Override
@@ -33,6 +34,8 @@ public class TestDataParameterResolver implements ParameterResolver {
                     949159500346L,
                     1626285630L
             );
+        } else if (parameterContext.getParameter().isAnnotationPresent(WalletAddress.class)) {
+            return "498WwTT53cGQg8hhQF2SgDGFFyaLmtfMG8vx76ST4ouGSXWUmtiQniq2P5ksrZF6cFQPiAKqvUdBkQMUjT5W8Spy3D2D3ZV";
         }
 
         throw new IllegalArgumentException();

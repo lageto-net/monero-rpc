@@ -1,9 +1,12 @@
 package net.lageto.monero.rpc;
 
 import net.lageto.monero.rpc.annotation.RpcMethod;
+import net.lageto.monero.rpc.annotation.RpcParam;
+import net.lageto.monero.rpc.model.TransferDestination;
 
 import java.lang.reflect.Proxy;
 import java.net.URI;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -44,4 +47,30 @@ public interface WalletRpcClient {
      */
     @RpcMethod(value = "get_address", body = "address")
     CompletableFuture<String> getAddressAsync();
+
+    /**
+     * Transfer Moneroj from this wallet to one or more recipients.
+     * <p>
+     * Note that this actually calls {@code transfer_split} which means that it may be split up into many transactions
+     * if required.
+     * </p>
+     *
+     * @param destinations list of recipients
+     * @return list of transaction hashes
+     */
+    @RpcMethod(value = "transfer_split", body = "tx_hash_list")
+    List<String> transfer(@RpcParam("destinations") List<TransferDestination> destinations);
+
+    /**
+     * Asynchronously transfer Moneroj from this wallet to one or more recipients.
+     * <p>
+     * Note that this actually calls {@code transfer_split} which means that it may be split up into many transactions
+     * if required.
+     * </p>
+     *
+     * @param destinations list of recipients
+     * @return list of transaction hashes
+     */
+    @RpcMethod(value = "transfer_split", body = "tx_hash_list")
+    CompletableFuture<List<String>> transferAsync(@RpcParam("destinations") List<TransferDestination> destinations);
 }

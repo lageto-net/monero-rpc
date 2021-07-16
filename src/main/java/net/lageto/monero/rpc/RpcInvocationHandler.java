@@ -19,8 +19,10 @@ package net.lageto.monero.rpc;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import net.lageto.monero.rpc.annotation.RpcMethod;
 import net.lageto.monero.rpc.annotation.RpcParam;
 import net.lageto.monero.rpc.http.JsonBodyHandler;
@@ -66,7 +68,11 @@ class RpcInvocationHandler implements InvocationHandler {
                         .build();
 
         if (method.getReturnType().equals(CompletableFuture.class)) {
-            var returnType = (Class<?>) ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments()[0];
+            var returnType = ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments()[0];
+            if (returnType instanceof ParameterizedType x) {
+                returnType = x.getRawType();
+            }
+            var returnClass = (Class<?>) returnType;
             return httpClient.sendAsync(request, new JsonBodyHandler(objectMapper))
                     .thenApply(HttpResponse::body)
                     .thenApply(this::checkResponseBody)
@@ -74,7 +80,7 @@ class RpcInvocationHandler implements InvocationHandler {
                     .thenApply(result -> rpcMethod.body().equals("$") ? result : result.get(rpcMethod.body()))
                     .thenApply(result -> {
                         try {
-                            return objectMapper.treeToValue(result, returnType);
+                            return objectMapper.treeToValue(result, returnClass);
                         } catch (JsonProcessingException e) {
                             throw new UncheckedIOException(e);
                         }

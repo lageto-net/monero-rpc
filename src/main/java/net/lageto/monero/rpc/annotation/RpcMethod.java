@@ -30,4 +30,6 @@ public @interface RpcMethod {
     String body() default "$";
 
     boolean array() default false;
+
+    Class<?> returnType() default void.class;
 }

@@ -16,6 +16,3 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
       - run: mvn --batch-mode --file pom.xml test
-      - uses: scacap/action-surefire-report@931cea1ce1cb7199a2fc6fe128bd1c392e92c92d
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}

@@ -3,6 +3,7 @@ name: Javadoc
 on:
   push:
     branches: [ master ]
+    paths: [ src/main/java/**.java ]
 jobs:
   build:
     name: Build

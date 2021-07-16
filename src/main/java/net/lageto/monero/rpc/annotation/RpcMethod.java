@@ -28,4 +28,6 @@ public @interface RpcMethod {
     String value();
 
     String body() default "$";
+
+    boolean array() default false;
 }

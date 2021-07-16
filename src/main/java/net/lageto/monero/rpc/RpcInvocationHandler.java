@@ -106,6 +106,10 @@ class RpcInvocationHandler implements InvocationHandler {
             return new RpcRequest<>(rpcMethod.value(), null);
         }
 
+        if (rpcMethod.array()) {
+            return new RpcRequest<>(rpcMethod.value(), Arrays.asList(args));
+        }
+
         var params = new HashMap<String, Object>();
         for (int i = 0; i < args.length; i++) {
             String paramName = Arrays.stream(method.getParameterAnnotations()[i])

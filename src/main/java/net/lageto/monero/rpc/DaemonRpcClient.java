@@ -131,4 +131,21 @@ public interface DaemonRpcClient {
     @RpcMethod(value = "get_block_template")
     CompletableFuture<BlockTemplate> getBlockTemplateAsync(@RpcParam("wallet_address") String walletAddress,
                                                            @RpcParam("reserve_size") int reserveSize);
+
+    /**
+     * Send a mined block for broadcast to the network.
+     *
+     * @param blob hex encoded block blob
+     */
+    @RpcMethod(value = "submit_block", array = true)
+    void submitBlock(String blob);
+
+    /**
+     * Asynchronously send a mined block for broadcast to the network.
+     *
+     * @param blob hex encoded block blob
+     * @return a future that completes when the call is finished
+     */
+    @RpcMethod(value = "submit_block", array = true)
+    CompletableFuture<Void> submitBlockAsync(String blob);
 }

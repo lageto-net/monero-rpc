@@ -5,6 +5,7 @@ import net.lageto.monero.rpc.model.BlockTemplate;
 import org.junit.jupiter.api.Test;
 import org.mockserver.client.MockServerClient;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -142,6 +143,37 @@ public class DaemonRpcClientTest extends RpcClientTest {
         assertEquals(blockTemplate, daemon.getBlockTemplate(walletAddress, 60));
         daemon.getBlockTemplateAsync(walletAddress, 60)
                 .thenAccept(actual -> assertEquals(blockTemplate, actual))
+                .join();
+    }
+
+    @Test
+    public void testSubmitBlock(BlockTemplate blockTemplate) {
+        getHttp()
+                .when(jsonrpcRequest("submit_block", List.of(blockTemplate.blob())))
+                .respond(jsonrpcResponse(Map.of("status", "OK")));
+
+        daemon.submitBlock(blockTemplate.blob());
+        daemon.submitBlockAsync(blockTemplate.blob()).join();
+    }
+
+    @Test
+    public void testSubmitBlockInvalid(BlockTemplate blockTemplate) {
+        getHttp()
+                .when(jsonrpcRequest("submit_block", List.of(blockTemplate.blob())))
+                .respond(jsonrpcError(-7, "Block not accepted"));
+
+        try {
+            daemon.submitBlock(blockTemplate.blob());
+            fail();
+        } catch (RpcException e) {
+            assertEquals(-7, e.getCode());
+        }
+        daemon.submitBlockAsync(blockTemplate.blob())
+                .thenAccept(x -> fail())
+                .exceptionally(e -> {
+                    assertEquals(-7, ((RpcException) e.getCause()).getCode());
+                    return null;
+                })
                 .join();
     }
 }

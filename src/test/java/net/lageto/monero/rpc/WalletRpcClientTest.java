@@ -67,4 +67,33 @@ public class WalletRpcClientTest extends RpcClientTest {
                 .thenAccept(hashes -> assertEquals(List.of(tx), hashes))
                 .join();
     }
+
+    @Test
+    public void testGetBalance(@WalletAddress String walletAddress) {
+        getHttp()
+                .when(jsonrpcRequest("get_balance"))
+                .respond(jsonrpcResponse(Map.of(
+                        "balance", 1234,
+                        "multisig_import_needed", false,
+                        "unlocked_balance", 123,
+                        "per_subaddress", List.of(Map.of(
+                                "address", walletAddress,
+                                "address_index", 0,
+                                "balance", 1234,
+                                "unlocked_balance", 123,
+                                "label", "",
+                                "num_unspent_outputs", 2
+                        ))
+                )));
+
+        assertEquals(1234, wallet.getBalance());
+        wallet.getBalanceAsync()
+                .thenAccept(balance -> assertEquals(1234, balance))
+                .join();
+
+        assertEquals(123, wallet.getUnlockedBalance());
+        wallet.getUnlockedBalanceAsync()
+                .thenAccept(unlockedBalance -> assertEquals(123, unlockedBalance))
+                .join();
+    }
 }

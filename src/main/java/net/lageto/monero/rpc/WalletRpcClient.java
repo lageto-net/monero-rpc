@@ -73,4 +73,41 @@ public interface WalletRpcClient {
      */
     @RpcMethod(value = "transfer_split", body = "tx_hash_list")
     CompletableFuture<List<String>> transferAsync(@RpcParam("destinations") List<TransferDestination> destinations);
+
+    /**
+     * Get the wallet's balance, including currently locked/un-spendable Moneroj.
+     *
+     * @return the wallet's balance, in atomic units. 1 moneroj = 1e12 atomic units
+     * @see #getBalanceAsync()
+     */
+    @RpcMethod(value = "get_balance", body = "balance")
+    long getBalance();
+
+    /**
+     * Asynchronously get the wallet's balance, including currently locked/un-spendable Moneroj.
+     *
+     * @return a future that completes to the wallet's balance, in atomic units. 1 moneroj = 1e12 atomic units
+     */
+    @RpcMethod(value = "get_balance", body = "balance")
+    CompletableFuture<Long> getBalanceAsync();
+
+    /**
+     * Get the wallet's unlocked balance.
+     *
+     * @return the wallet's balance, in atomic units. 1 moneroj = 1e12 atomic units
+     * @see #getUnlockedBalanceAsync()
+     * @see #getBalance()
+     */
+    @RpcMethod(value = "get_balance", body = "unlocked_balance")
+    long getUnlockedBalance();
+
+    /**
+     * Asynchronously get the wallet's unlocked balance.
+     *
+     * @return a future that completes to the wallet's balance, in atomic units. 1 moneroj = 1e12 atomic units
+     * @see #getUnlockedBalance()
+     * @see #getBalanceAsync()
+     */
+    @RpcMethod(value = "get_balance", body = "unlocked_balance")
+    CompletableFuture<Long> getUnlockedBalanceAsync();
 }

@@ -1,9 +1,11 @@
 ---
+name: Javadoc
 on:
   push:
     branches: [ master ]
 jobs:
-  javadoc:
+  build:
+    name: Build
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2

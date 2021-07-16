@@ -14,7 +14,7 @@ See below for various build tool snippets.
 <dependency>
     <groupId>net.lageto.monero</groupId>
     <artifactId>rpc</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
 </dependency>
 ```
 

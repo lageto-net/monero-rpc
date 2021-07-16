@@ -1,6 +1,7 @@
 package net.lageto.monero.rpc;
 
 import net.lageto.monero.rpc.model.BlockHeader;
+import net.lageto.monero.rpc.model.BlockTemplate;
 import org.junit.jupiter.api.Test;
 import org.mockserver.client.MockServerClient;
 
@@ -111,6 +112,36 @@ public class DaemonRpcClientTest extends RpcClientTest {
                     assertEquals(-5, ((RpcException) e.getCause()).getCode());
                     return null;
                 })
+                .join();
+    }
+
+    @Test
+    public void testGetBlockTemplate(@WalletAddress String walletAddress, BlockTemplate blockTemplate) {
+        getHttp()
+                .when(jsonrpcRequest("get_block_template", Map.of(
+                        "wallet_address", walletAddress,
+                        "reserve_size", 60
+                )))
+                .respond(jsonrpcResponse(Map.ofEntries(
+                        Map.entry("blockhashing_blob", blockTemplate.hashingBlob()),
+                        Map.entry("blocktemplate_blob", blockTemplate.blob()),
+                        Map.entry("difficulty", blockTemplate.difficulty()),
+                        Map.entry("difficulty_top64", 0),
+                        Map.entry("expected_reward", blockTemplate.expectedReward()),
+                        Map.entry("height", blockTemplate.height()),
+                        Map.entry("next_seed_hash", blockTemplate.nextSeedHash()),
+                        Map.entry("prev_hash", blockTemplate.prevHash()),
+                        Map.entry("reserved_offset", blockTemplate.reservedOffset()),
+                        Map.entry("seed_hash", blockTemplate.seedHash()),
+                        Map.entry("seed_height", blockTemplate.seedHeight()),
+                        Map.entry("status", "OK"),
+                        Map.entry("untrusted", "false"),
+                        Map.entry("wide_difficulty", "0x4506bd701f")
+                )));
+
+        assertEquals(blockTemplate, daemon.getBlockTemplate(walletAddress, 60));
+        daemon.getBlockTemplateAsync(walletAddress, 60)
+                .thenAccept(actual -> assertEquals(blockTemplate, actual))
                 .join();
     }
 }

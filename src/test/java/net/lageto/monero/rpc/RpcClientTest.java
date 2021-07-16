@@ -1,5 +1,6 @@
 package net.lageto.monero.rpc;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockserver.client.MockServerClient;
@@ -8,6 +9,8 @@ import org.mockserver.matchers.MatchType;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URI;
 import java.util.Map;
 
@@ -18,6 +21,8 @@ import static org.mockserver.model.JsonBody.json;
 @ExtendWith(MockServerExtension.class)
 @ExtendWith(TestDataParameterResolver.class)
 public abstract class RpcClientTest {
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
     private final MockServerClient http;
 
     public RpcClientTest(MockServerClient http) {
@@ -37,12 +42,17 @@ public abstract class RpcClientTest {
     }
 
     public static HttpResponse jsonrpcResponse(Object result) {
-        return response()
-                .withBody(json(Map.of(
-                        "jsonrpc", "2.0",
-                        "id", 0,
-                        "result", result
-                )));
+        try {
+            // Mock-Server's response builder's `json(Object)' method turns empty strings into null which is not wanted.
+            return response()
+                    .withBody(json(objectMapper.writeValueAsString(Map.of(
+                            "jsonrpc", "2.0",
+                            "id", 0,
+                            "result", result
+                    ))));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     public static HttpRequest jsonrpcRequest(String method) {

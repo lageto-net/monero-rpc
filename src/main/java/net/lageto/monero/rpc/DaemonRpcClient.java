@@ -19,6 +19,7 @@ package net.lageto.monero.rpc;
 import net.lageto.monero.rpc.annotation.RpcMethod;
 import net.lageto.monero.rpc.annotation.RpcParam;
 import net.lageto.monero.rpc.model.BlockHeader;
+import net.lageto.monero.rpc.model.BlockTemplate;
 
 import java.lang.reflect.Proxy;
 import java.net.URI;
@@ -106,4 +107,28 @@ public interface DaemonRpcClient {
      */
     @RpcMethod(value = "get_block_header_by_height", body = "block_header")
     CompletableFuture<BlockHeader> getBlockHeaderAsync(@RpcParam("height") long height);
+
+    /**
+     * Create a block template.
+     *
+     * @param walletAddress wallet address to send mining reward to
+     * @param reserveSize   number of bytes to reserve for extra nonce in miner reward tx
+     * @return a new block template
+     * @see #getBlockTemplateAsync(String, int)
+     */
+    @RpcMethod(value = "get_block_template")
+    BlockTemplate getBlockTemplate(@RpcParam("wallet_address") String walletAddress,
+                                   @RpcParam("reserve_size") int reserveSize);
+
+    /**
+     * Asynchronously create a block template.
+     *
+     * @param walletAddress wallet address to send mining reward to
+     * @param reserveSize   number of bytes to reserve for extra nonce in miner reward tx
+     * @return a future that completes to a new block template
+     * @see #getBlockTemplate(String, int)
+     */
+    @RpcMethod(value = "get_block_template")
+    CompletableFuture<BlockTemplate> getBlockTemplateAsync(@RpcParam("wallet_address") String walletAddress,
+                                                           @RpcParam("reserve_size") int reserveSize);
 }

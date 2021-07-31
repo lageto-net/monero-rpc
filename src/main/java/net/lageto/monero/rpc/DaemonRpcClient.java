@@ -18,6 +18,7 @@ package net.lageto.monero.rpc;
 
 import net.lageto.monero.rpc.annotation.RpcMethod;
 import net.lageto.monero.rpc.annotation.RpcParam;
+import net.lageto.monero.rpc.model.Block;
 import net.lageto.monero.rpc.model.BlockHeader;
 import net.lageto.monero.rpc.model.BlockTemplate;
 
@@ -45,6 +46,48 @@ public interface DaemonRpcClient {
                 new RpcInvocationHandler(address)
         );
     }
+
+    /**
+     * Get a block header and the transaction hashes it contains by its height.
+     *
+     * @param height height of block to look up (0 based)
+     * @return block containing header and transaction hashes
+     * @see #getBlockAsync(long)
+     */
+    @RpcMethod(value = "get_block")
+    Block getBlock(@RpcParam("height") long height);
+
+    /**
+     * Asynchronously get a block header and the transaction hashes it contains by its height.
+     *
+     * @param height height of block to look up (0 based)
+     * @return a future that completes to block containing header and transaction hashes
+     * @see #getBlock(long)
+     */
+    @RpcMethod(value = "get_block")
+    CompletableFuture<Block> getBlockAsync(@RpcParam("height") long height);
+
+    /**
+     * Get a block header and the transaction hashes it contains by its hash.
+     *
+     * @param hash hash of block to lookup
+     * @return block containing header and transaction hashes
+     * @see #getBlock(long)
+     * @see #getBlockAsync(String)
+     */
+    @RpcMethod(value = "get_block")
+    Block getBlock(@RpcParam("hash") String hash);
+
+    /**
+     * Asynchronously get a block header and the transaction hashes it contains by its hash.
+     *
+     * @param hash hash of block to lookup
+     * @return a future that completes to block containing header and transaction hashes
+     * @see #getBlockAsync(long)
+     * @see #getBlock(String)
+     */
+    @RpcMethod(value = "get_block")
+    CompletableFuture<Block> getBlockAsync(@RpcParam("hash") String hash);
 
     /**
      * Look up how many blocks are in the longest chain known to the daemon.

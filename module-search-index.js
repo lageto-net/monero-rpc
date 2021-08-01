@@ -1,1 +1,1 @@
-moduleSearchIndex = [{"l":"lageto.monero.rpc"}];updateSearchResults();
+moduleSearchIndex = [{"l":"lageto.monero.rpc"},{"l":"lageto.monero.rpc.spring"}];updateSearchResults();

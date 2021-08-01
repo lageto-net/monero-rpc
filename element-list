@@ -1,3 +1,5 @@
 module:lageto.monero.rpc
 net.lageto.monero.rpc
 net.lageto.monero.rpc.model
+module:lageto.monero.rpc.spring
+net.lageto.monero.rpc.spring

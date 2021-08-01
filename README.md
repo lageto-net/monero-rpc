@@ -24,6 +24,29 @@ See below for various build tool snippets.
 implementation 'net.lageto.monero:rpc:0.1.0'
 ```
 
+## Spring Boot Starter
+
+A Spring Boot starter is available to automatically configure RPC clients in Spring Applications.
+
+Add the dependency:
+
+```
+<dependency>
+    <groupId>net.lageto.monero</groupId>
+    <artifactId>rpc-spring-boot-starter</artifactId>
+    <version>0.3.0-SNAPSHOT</version>
+</dependency>
+```
+
+URIs can then be configured in `application.properties`:
+
+```
+monero.rpc.daemon=http://localhost:18081/json_rpc
+monero.rpc.wallet=http://localhost:18083/json_rpc
+```
+
+`DaemonRpcClient` and `WalletRpcClient` beans are then created.
+
 ## Example Usage
 
 ```java

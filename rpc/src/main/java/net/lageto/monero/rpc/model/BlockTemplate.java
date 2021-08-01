@@ -2,6 +2,11 @@ package net.lageto.monero.rpc.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * Represents an un-mined Monero block.
+ *
+ * @see net.lageto.monero.rpc.DaemonRpcClient#getBlockTemplate(String, int)
+ */
 public record BlockTemplate(
         @JsonProperty("blockhashing_blob") String hashingBlob,
         @JsonProperty("blocktemplate_blob") String blob,

@@ -14,14 +14,14 @@ See below for various build tool snippets.
 <dependency>
     <groupId>net.lageto.monero</groupId>
     <artifactId>rpc</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
 </dependency>
 ```
 
 ##### Gradle
 
 ```groovy
-implementation 'net.lageto.monero:rpc:0.1.0'
+implementation 'net.lageto.monero:rpc:0.3.0'
 ```
 
 ## Spring Boot Starter
@@ -34,7 +34,7 @@ Add the dependency:
 <dependency>
     <groupId>net.lageto.monero</groupId>
     <artifactId>rpc-spring-boot-starter</artifactId>
-    <version>0.3.0-SNAPSHOT</version>
+    <version>0.3.0</version>
 </dependency>
 ```
 

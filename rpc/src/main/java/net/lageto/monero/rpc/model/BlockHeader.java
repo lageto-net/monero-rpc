@@ -17,10 +17,11 @@
 package net.lageto.monero.rpc.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import net.lageto.monero.rpc.DaemonRpcClient;
 
 /**
- * @see net.lageto.monero.rpc.DaemonRpcClient#getBlockHeader(String)
- * @see net.lageto.monero.rpc.DaemonRpcClient#getBlockHeader(long)
+ * @see DaemonRpcClient#getBlockHeader(String)
+ * @see DaemonRpcClient#getBlockHeader(long)
  */
 public record BlockHeader(
         @JsonProperty("block_size") int blockSize,

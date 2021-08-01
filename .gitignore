@@ -4,7 +4,7 @@
 hs_err_pid*.log
 
 # Maven
-/target/
+target/
 pom.xml.*
 dependency-reduced-pom.xml
 release.properties

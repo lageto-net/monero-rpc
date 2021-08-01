@@ -18,9 +18,9 @@ package net.lageto.monero.rpc;
 
 import net.lageto.monero.rpc.annotation.RpcMethod;
 import net.lageto.monero.rpc.annotation.RpcParam;
-import net.lageto.monero.rpc.model.Block;
 import net.lageto.monero.rpc.model.BlockHeader;
 import net.lageto.monero.rpc.model.BlockTemplate;
+import net.lageto.monero.rpc.model.Block;
 
 import java.lang.reflect.Proxy;
 import java.net.URI;

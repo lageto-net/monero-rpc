@@ -19,7 +19,7 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
       - run: mvn --batch-mode --file pom.xml javadoc:aggregate
-      - uses: peaceiris/actions-gh-pages@068dc23d9710f1ba62e86896f84735d869951305
+      - uses: peaceiris/actions-gh-pages@64b46b4226a4a12da2239ba3ea5aa73e3163c75b
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: target/site/apidocs
